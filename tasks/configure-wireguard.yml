@@ -25,5 +25,5 @@
   - name: Enable and start WireGuard
     systemd:
       name: "wg-quick@{{ wireguard_interface }}"
-      enabled: false
+      enabled: true
       state: started
