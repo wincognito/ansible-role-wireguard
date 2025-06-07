@@ -1,0 +1,11 @@
+# roles/wireguard/tasks/delete-keys.yml
+- name: Delete keys (with elevated privileges)
+  become: true
+  block:
+  - name: Ensure WireGuard config directory exists
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop:
+    - "{{ wireguard_private_key_path }}"
+    - "{{ wireguard_public_key_path }}"

@@ -1,0 +1,7 @@
+# roles/wireguard/tasks/install-wireguard.yml
+- name: Install Wireguard (with elevated privileges)
+  apt:
+    name: wireguard
+    state: present
+    update_cache: yes
+  become: true

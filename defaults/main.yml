@@ -1,0 +1,12 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for ansible-role-wireguard
+
+wireguard_interface: wg0
+wireguard_port: 51820 # UDP port
+wireguard_private_key_path: "/etc/wireguard/privatekey"
+wireguard_public_key_path: "/etc/wireguard/publickey"
+wireguard_all_peers_inventory_group: "wireguard" # all hosts from this group are peers
+
+# wireguard_address: 10.0.0.2/32, fd86:ea04:1115::1/128 # IP address in VPN
+# wireguard_endpoint: vpn.example.com:51820 # IP address in insecure framework

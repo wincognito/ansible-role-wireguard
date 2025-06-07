@@ -1,0 +1,10 @@
+- name: Read existing WireGuard public key if present
+  slurp:
+    src: "{{ wireguard_public_key_path }}"
+  register: public_key_file
+  ignore_errors: yes
+
+- name: Set public key content
+  set_fact:
+    wireguard_public_key_content: "{{ public_key_file.content | b64decode }}"
+  when: public_key_file is defined and public_key_file.content is defined
