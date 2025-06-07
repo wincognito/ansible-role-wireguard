@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for ansible-role-wireguard
+
+- name: Restart WireGuard
+  systemd:
+    name: "wg-quick@{{ wireguard_interface }}"
+    state: restarted
+  become: true

@@ -1,0 +1,49 @@
+# roles/wireguard/tasks/create-keys.yml
+- name: Create keys if non existing (with elevated privileges)
+  become: true
+  block:
+  - name: Ensure WireGuard config directory exists
+    file:
+      path: "{{ wireguard_conf_path }}"
+      state: directory
+      mode: "0755"
+
+  - name: Check if WireGuard private key exists
+    stat:
+      path: "{{ wireguard_private_key_path }}"
+    register: private_key_stat
+
+  - name: Generate private key if not present
+    command: wg genkey
+    register: wg_private_key
+    changed_when: wg_private_key.stdout != ""
+    when: not private_key_stat.stat.exists
+
+  - name: Set private key content
+    set_fact:
+      wireguard_private_key_content: "{{ wg_private_key.stdout }}"
+    when: wg_private_key is defined and wg_private_key.stdout is defined
+
+  - name: Save private key
+    copy:
+      content: "{{ wireguard_private_key_content }}"
+      dest: "{{ wireguard_private_key_path }}"
+      mode: "0600"
+    when: wireguard_private_key_content is defined
+
+  - name: Generate public key
+    command: "/bin/bash -c 'echo {{ wireguard_private_key_content }} | wg pubkey'"
+    register: wg_public_key
+    when: wireguard_private_key_content is defined
+
+  - name: Set public key content
+    set_fact:
+      wireguard_public_key_content: "{{ wg_public_key.stdout }}"
+    when: wg_public_key is defined and wg_public_key.stdout is defined
+
+  - name: Save public key
+    copy:
+      content: "{{ wireguard_public_key_content }}"
+      dest: "{{ wireguard_public_key_path }}"
+      mode: "0644"
+    when: wireguard_public_key_content is defined

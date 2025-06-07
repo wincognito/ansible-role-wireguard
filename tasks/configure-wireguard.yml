@@ -1,0 +1,29 @@
+# roles/wireguard/tasks/configure-wireguard.yml
+- name: Configure Wireguard (with elevated privileges)
+  become: true
+  block:
+  - name: Read existing WireGuard private key if present
+    slurp:
+      src: "{{ wireguard_private_key_path }}"
+    register: private_key_file
+    ignore_errors: yes
+    no_log: true
+
+  - name: Set private key content
+    set_fact:
+      wireguard_private_key_content: "{{ private_key_file.content | b64decode }}"
+    when: private_key_file is defined and private_key_file.content is defined
+    no_log: true
+
+  - name: Template WireGuard config
+    template:
+      src: wireguard.conf.j2
+      dest: "{{ wireguard_conf_path }}/{{ wireguard_interface }}.conf"
+      mode: "0600"
+    notify: Restart WireGuard
+
+  - name: Enable and start WireGuard
+    systemd:
+      name: "wg-quick@{{ wireguard_interface }}"
+      enabled: false
+      state: started
